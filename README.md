@@ -18,7 +18,7 @@ I am creating a bot in my free time that aims to inspire and amuse students in m
 6. Customize the bot to your liking
 
 8. Enable **Privileged Gateway Intents**: Presence Intent, Server Members Intent and Message Content Intent
-9. 
+
 ![image](https://user-images.githubusercontent.com/28844061/221652833-04f1744f-890a-4af4-ac12-3aadf2669d15.png)
 
 12. Save all changes
@@ -28,7 +28,7 @@ I am creating a bot in my free time that aims to inspire and amuse students in m
 ![image](https://user-images.githubusercontent.com/28844061/221652498-311372c9-30dc-4993-81cf-eab3c1f4f200.png)
 
 10. In **Scopes** select **bot**
-11. 
+
 ![image](https://user-images.githubusercontent.com/28844061/221652943-473882a9-1f6d-42cb-a70f-c36d5035b058.png)
 
 12. In **Bot Permissions** select **Administartor**
