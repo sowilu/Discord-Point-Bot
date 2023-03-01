@@ -80,6 +80,53 @@ async def add_roles(ctx: Context):
         await ctx.guild.create_role(name=name, hoist=True, colour=data['color'])
     await ctx.message.add_reaction('👌')
 
+@bot.command(brief="Gives user a specified role", description="Adds tiers")
+async def give_role(ctx: Context, role_name: str, *users: discord.Member):
+    if not await check_admin(ctx):
+        return
+
+    if len(users) == 0:
+        await ctx.send('Please provide user(s)')
+        return
+
+    role = None
+
+    #get all roles in server
+    server_roles = ctx.guild.roles
+
+    #find role with specified name
+    for server_role in server_roles:
+        if server_role.name == role_name:
+            role = server_role
+            break
+    else:
+        #check if role in roles dict
+        if role_name in roles:
+            role = await ctx.guild.create_role(name=role_name, hoist=True, colour=roles[role_name]['color'])
+
+        else:
+            #create role
+            role = await ctx.guild.create_role(name=role_name, hoist=True, colour=0x000000)
+
+    try:
+        for user in users:
+            await user.add_roles(server_role)
+
+        await ctx.message.add_reaction('👌')
+    except Exception as e:
+        await ctx.message.add_reaction('👎')
+        print(e)
+
+
+@give_role.error
+async def example_command_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        # Handle the error
+        await ctx.send('Please provide role name')
+
+
+
+
 def get_role(score: int):
     role = ""
 
@@ -90,13 +137,7 @@ def get_role(score: int):
     return role
 
 
-'''
-@example_command.error
-async def example_command_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        # Handle the error
-        await ctx.send('Please provide all required arguments.')
-'''
+
 
 #UTILITY
 async def check_admin(ctx : Context):
