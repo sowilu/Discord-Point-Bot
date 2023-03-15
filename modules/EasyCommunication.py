@@ -9,7 +9,7 @@ class EasyCommunication(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @bot.command(brief='waits for specified time and notifies when done',
+    @commands.command(brief='waits for specified time and notifies when done',
                  description='waits for specified time and notifies when done. Enter time in seconds, minutes, hours by adding s, m, h after the number. Example: plz wait 5m 20s. Can also be used to wait for a specific time. Example: plz wait 16:30')
     async def timer(this, ctx: Context, *time_args):
         if len(time_args) == 0:
