@@ -1,0 +1,36 @@
+Intro to programming
+Conditions: if-else. 
+Loop: while. 
+Loop: for.
+Exercises
+Funkcijos
+List
+Importing: math and random
+Dictionary
+Exercises
+Failes
+Exercises
+Test prep
+Test
+Game: pong
+Game: snake
+Encryption 
+Python installation, pip
+All knowing app: Wiki pip package 
+JSON
+Requests 
+File manager
+Test prep
+Test
+Raster Image editor 
+Raster Image editor 
+Raster Image editor 
+Audio player
+Noise functions
+Terraria procedural world generation
+Discord bot 
+Discord bot 
+Projektas
+Projektas 
+Projektas 
+Projektas

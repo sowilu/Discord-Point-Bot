@@ -1,10 +1,8 @@
-import discord
+import random
 import os
 from discord.ext import commands
-from discord.ext.commands.context import Context
 from dotenv import load_dotenv
-import asyncio
-from datetime import datetime
+from utilities import *
 
 
 load_dotenv()
@@ -14,46 +12,95 @@ intents = discord.Intents.all()
 intents.members = True
 intents.typing = True
 intents.presences = True
-bot = commands.Bot(command_prefix='plz ', intents=intents)
+bot = commands.Bot(command_prefix='dw ', intents=intents)
 
-
-# EVENTS
 @bot.event
 async def on_ready():
     print(f"I'm in {bot.user}")
 
+    # import cogs
+    for filename in os.listdir('modules'):
+        if filename.endswith('.py'):
+            await bot.load_extension(f'modules.{filename[:-3]}')
 
-@bot.command(brief='waits for specified time and notifies when done',description='waits for specified time and notifies when done. Enter time in seconds, minutes, hours by adding s, m, h after the number. Example: plz wait 5m 20s. Can also be used to wait for a specific time. Example: plz wait 16:30')
-async def timer(ctx: Context, *time_args):
-    if len(time_args) == 0:
-        await ctx.send("Please specify a time")
+    await bot.change_presence(activity=discord.Game(random.choice(games)))
+
+@bot.event
+async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
+    global monitor, test_shops, test_orders
+
+    if payload.member == bot.user:
         return
 
-    seconds, minutes, hours = 0, 0, 0
-    for arg in time_args:
-        if arg[-1] == 's':
-            seconds += int(arg[:-1])
-        elif arg[-1] == 'm':
-            minutes += int(arg[:-1])
-        elif arg[-1] == 'h':
-            hours += int(arg[:-1])
+    #if message id in test_shops keys
+    if payload.message_id in test_shops:
 
-    if ":" in time_args[0]:
-        now = datetime.now()
-        values = time_args[0].split(":")
-        target_hours = int(values[0])
-        target_minutes = int(values[1])
-        hours = target_hours - now.hour
-        minutes = target_minutes - now.minute - 1
-        seconds = 60 - now.second
+        guild = await bot.fetch_guild(payload.guild_id)
+        user = await guild.fetch_member(payload.user_id)
+        id = -1
 
-    time = seconds + minutes * 60 + hours * 3600
-    if time <= 0:
-        await ctx.message.add_reaction('👎')
+        #if emoji is 1️⃣
+        if payload.emoji.name == "1️⃣":
+            id = 0
+        elif payload.emoji.name == "2️⃣":
+            id = 1
+            #, '', '4️⃣', '5️⃣', '6️⃣":
+        elif payload.emoji.name == "3️⃣":
+            id = 2
+        elif payload.emoji.name == "4️⃣":
+            id = 3
+        elif payload.emoji.name == "5️⃣":
+            id = 4
+        elif payload.emoji.name == "6️⃣":
+            id = 5
+
+        #get channel in which message is
+        channel = bot.get_channel(payload.channel_id)
+
+        #get server name
+        guild = await bot.fetch_guild(payload.guild_id)
+
+        #send dm to a person who bought something
+        await user.send(buy(guild, user, id))
+
         return
 
-    await ctx.message.add_reaction('👌')
-    await asyncio.sleep(time)
-    await ctx.send(f'Time is up!🔔', reference=ctx.message)
+    if not payload.member.guild_permissions.administrator:
+        return
+    
+    guild = await bot.fetch_guild(payload.guild_id)
+    if guild.name not in monitor:
+        return
+    
+    channel = bot.get_channel(payload.channel_id)
+    message = await channel.fetch_message(payload.message_id)
+    
+    file_name = guild.name.replace(' ', '_') + '.json'
+
+    #add reaction to message
+    await message.add_reaction("✅")
+
+    await add_points(file_name, monitor[guild.name], [message.author])
+
+@bot.event
+async def on_message(message):
+    if message.author.bot:
+        return  # Ignore messages from bots
+
+    if message.author.guild_permissions.administrator:
+
+        if message.content[0:2] == "dw" or message.content[0:2] == "``":
+            await bot.process_commands(message)
+            return
+
+        #lang = get_code_language(message.content)
+        if message.content[0:2] == "py":
+            #print(lang)
+            new_content = f"```py\n{message.content[2:]}```"
+            await message.channel.send(new_content)
+            await message.delete()
+
+
+    await bot.process_commands(message)
 
 bot.run(TOKEN)
